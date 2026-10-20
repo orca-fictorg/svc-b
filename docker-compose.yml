@@ -1,0 +1,17 @@
+services:
+  svc-b:
+    image: node:26.9
+    working_dir: /app
+    command: ["node", "server.js"]
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - ./server.js:/app/server.js:ro
+      # The link-sdk extension links the sdk library here, wherever it's cloned
+      - ./node_modules/@fictorg/sdk:/app/node_modules/@fictorg/sdk:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.svc-b.rule: Host(`svc-b.orca-fictorg.test`)
+      traefik.http.routers.svc-b.entrypoints: websecure
+      traefik.http.routers.svc-b.tls: "true"
+      traefik.http.services.svc-b.loadbalancer.server.port: "8080"

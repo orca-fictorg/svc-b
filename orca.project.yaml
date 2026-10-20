@@ -1,0 +1,42 @@
+composeFiles:
+  primary: docker-compose.yml
+
+envFiles:
+  - path: .env
+
+hosts:
+  - svc-b.orca-fictorg.test
+
+extensions:
+  - name: env
+    type: syncFile
+    source: .env.example
+    target: .env
+    description: Create .env from .env.example
+
+  # Wherever the workspace clones the sdk library, it's linked in here
+  - name: link-sdk
+    type: symlink
+    source: "{{ .Projects.sdk.Path }}"
+    target: node_modules/@fictorg/sdk
+    description: Link the sdk library into node_modules
+
+  - name: node-version
+    service: svc-b
+    command: node --version
+    description: Show the version of node in the container
+
+  - name: check-sdk
+    command: make check-sdk
+    description: Check the sdk library is linked in
+
+hooks:
+  clone:
+    post:
+      - extension: env
+      - extension: link-sdk
+      - extension: install-deps
+        scope: workspace
+  up:
+    pre:
+      - extension: check-sdk
