@@ -30,13 +30,16 @@ extensions:
     command: make check-sdk
     description: Check the sdk library is linked in
 
+  - name: install-deps
+    command: make deps
+    description: Install svc-b's dependencies
+
 hooks:
   clone:
     post:
       - extension: env
       - extension: link-sdk
       - extension: install-deps
-        scope: workspace
   up:
     pre:
       - extension: check-sdk
